@@ -1,0 +1,48 @@
+Project:
+  General:
+    _Base:
+      work_dir:
+        value: "./repos/GameScripts"
+        disabled: true
+      background:
+        value: false
+        disabled: true
+      config_path:
+        value: "./repos/GameScripts/config/config.json"
+        disabled: true
+      log_path:
+        value: "."
+  Update:
+    _Base:
+      env_name:
+        value: "zafkiel"
+
+游戏:
+  原神:
+    _Base:
+      command:
+        value: python main.py 0
+        disabled: true
+    游戏设置:
+      BetterGI路径:
+        type: file
+        value: ""
+        help: "BetterGI.exe的文件路径\nhttps://github.com/babalae/better-genshin-impact"
+      最长运行时间:
+        type: input
+        value: 30
+        help: "最长运行时间，单位为分钟，超时将强制终止程序\n0表示不限制"
+  绝区零:
+    _Base:
+        command:
+          value: python main.py 1
+          disabled: true
+    游戏设置:
+      调度器路径:
+        type: file
+        value: ""
+        help: "OneDragon Scheduler.exe的文件路径\nhttps://github.com/DoctorReid/ZenlessZoneZero-OneDragon"
+      最长运行时间:
+        type: input
+        value: 30
+        help: "最长运行时间，单位为分钟，超时将强制终止程序\n0表示不限制"
