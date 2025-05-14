@@ -8,7 +8,8 @@ from pathlib import Path
 
 import win32api
 import win32job
-import win32process
+import win32con
+
 
 # 配置日志格式
 logging.basicConfig(
@@ -26,54 +27,127 @@ class JobObjectManager:
         self.job = None
         self.proc_info = None
         self.pid = None
+        self.process = None
+        self.output_thread = None
 
     def start(self):
         """创建job object并启动进程"""
-        # 创建Job对象，配置为关闭时终止所有子进程
-        self.job = win32job.CreateJobObject(None, "")
-        extended_info = win32job.QueryInformationJobObject(
-            self.job, win32job.JobObjectExtendedLimitInformation
-        )
-        extended_info["BasicLimitInformation"]["LimitFlags"] = (
-            win32job.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
-        )
-        win32job.SetInformationJobObject(
-            self.job,
-            win32job.JobObjectExtendedLimitInformation,
-            extended_info,
-        )
+        try:
+            # 创建Job对象，配置为关闭时终止所有子进程
+            self.job = win32job.CreateJobObject(None, "")
+            extended_info = win32job.QueryInformationJobObject(
+                self.job, win32job.JobObjectExtendedLimitInformation
+            )
+            extended_info["BasicLimitInformation"]["LimitFlags"] = (
+                win32job.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+            )
+            win32job.SetInformationJobObject(
+                self.job,
+                win32job.JobObjectExtendedLimitInformation,
+                extended_info,
+            )
 
-        # 启动进程（初始为暂停状态）
-        si = win32process.STARTUPINFO()
-        self.proc_info = win32process.CreateProcess(
-            None,
-            self.command,
-            None,
-            None,
-            True,
-            win32process.CREATE_SUSPENDED | win32process.CREATE_BREAKAWAY_FROM_JOB,
-            None,
-            None,
-            si,
-        )
+            # 启动进程
+            self.process = subprocess.Popen(
+                self.command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                shell=True,
+                text=True,
+                encoding="gbk",
+            )
 
-        # 记录PID并将进程添加到Job
-        self.pid = self.proc_info[2]
-        win32job.AssignProcessToJobObject(self.job, self.proc_info[0])
+            # 记录PID
+            self.pid = self.process.pid
 
-        # 恢复进程执行
-        win32process.ResumeThread(self.proc_info[1])
-        logging.info(f"主进程 PID: {self.pid}")
+            # 打开进程句柄并将进程添加到Job
+            process_handle = win32api.OpenProcess(
+                win32con.PROCESS_ALL_ACCESS,
+                False,
+                self.pid,  # 使用win32con而不是win32process
+            )
+            win32job.AssignProcessToJobObject(self.job, process_handle)
+            win32api.CloseHandle(process_handle)  # 关闭我们打开的句柄
+
+            logging.info(f"主进程 PID: {self.pid}")
+
+            return True
+        except Exception as e:
+            logging.error(f"启动进程失败: {e}")
+            self.kill()  # 清理资源
+            return False
+
+    def start_output_monitoring(self, callback):
+        """启动输出监控线程"""
+        if self.process and self.process.stdout:
+
+            def read_stream():
+                for line in iter(self.process.stdout.readline, ""):
+                    if line:
+                        callback(line)
+                self.process.stdout.close()
+
+            self.output_thread = threading.Thread(target=read_stream, daemon=True)
+            self.output_thread.start()
 
     def kill(self):
-        """终止Job及其所有相关进程"""
+        """终止Job及其所有相关进程，清理资源"""
+        # 关闭Job Object句柄
         if self.job:
             try:
                 win32api.CloseHandle(self.job)
-                self.job = None
                 logging.info("已通过 Job Object 终止整个进程树")
             except Exception as e:
                 logging.error(f"关闭 Job Object 失败: {e}")
+            finally:
+                self.job = None
+
+        # 关闭进程对象
+        if self.process:
+            try:
+                self.process.terminate()
+            except:  # noqa: E722
+                pass
+            self.process = None
+
+    def job_info(self, stats):
+        """获取当前Job中的进程详细信息"""
+        logging.info(
+            f"Job状态: 总进程数={stats['TotalProcesses']}, 活跃={stats['ActiveProcesses']}"
+        )
+        if stats["TotalProcesses"] > 0:
+            try:
+                # 获取Job中的进程列表（仅PID）
+                process_ids = win32job.QueryInformationJobObject(
+                    self.job, win32job.JobObjectBasicProcessIdList
+                )
+
+                if process_ids:
+                    process_info = []
+                    import psutil
+
+                    try:
+                        pid_to_name = {}
+                        for pid in process_ids:
+                            try:
+                                p = psutil.Process(pid)
+                                pid_to_name[pid] = p.name()
+                            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                                pid_to_name[pid] = "无法访问"
+
+                        for pid in process_ids:
+                            proc_name = pid_to_name.get(pid, "未知")
+                            process_info.append(f"PID:{pid}({proc_name})")
+
+                        processes_str = ", ".join(process_info)
+                        logging.info(f"Job中的活跃进程: {processes_str}")
+                    except Exception as e:
+                        logging.warning(f"获取进程名称时出错: {e}")
+                        processes_str = ", ".join([f"PID:{pid}" for pid in process_ids])
+                        logging.info(f"Job中的活跃进程: {processes_str}")
+
+            except Exception as e:
+                logging.warning(f"无法获取Job中的进程列表: {e}")
 
     def has_active_processes(self):
         """检查Job中是否还有活跃进程"""
@@ -84,22 +158,25 @@ class JobObjectManager:
             stats = win32job.QueryInformationJobObject(
                 self.job, win32job.JobObjectBasicAccountingInformation
             )
-            return stats["TotalProcesses"] > 0
+            # self.job_info(stats)
+            return stats["ActiveProcesses"] > 0
         except Exception as e:
-            logging.warning(f"无法查询 Job 状态: {e}")
+            logging.warning(f"无法查询Job状态: {e}")
             return False
 
+    def wait_for_output_thread(self, timeout=1):
+        """等待输出线程完成"""
+        if self.output_thread and self.output_thread.is_alive():
+            self.output_thread.join(timeout=timeout)
 
-def read_stream(stream, callback):
-    """持续读取流并将每行传递给回调函数"""
-    for line in iter(stream.readline, b""):
-        callback(line)
-    stream.close()
+    def __del__(self):
+        """析构函数，确保资源被清理"""
+        self.kill()
 
 
 def main():
     # 解析命令行参数
-    parser = argparse.ArgumentParser(description="游戏进程管理工具")
+    parser = argparse.ArgumentParser()
     parser.add_argument("option", help="选择要启动的游戏: 0=原神, 1=绝区零")
     args = parser.parse_args()
 
@@ -130,28 +207,16 @@ def main():
 
     # 启动Job管理器
     job_manager = JobObjectManager(cmd)
-    job_manager.start()
+    if not job_manager.start():
+        return
 
     # 处理进程输出
     def handle_output(line):
         if line:
-            logging.info(line.strip())
+            print(line.strip())
 
-    # 启动Popen获取输出
-    proc = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        shell=True,
-        text=True,  # 使用text替代universal_newlines
-        encoding="utf-8",
-    )
-
-    # 启动线程读取输出
-    output_thread = threading.Thread(
-        target=read_stream, args=(proc.stdout, handle_output), daemon=True
-    )
-    output_thread.start()
+    # 启动输出监控
+    job_manager.start_output_monitoring(handle_output)
 
     # 监控进程，处理超时
     start_time = time.time()
@@ -168,8 +233,9 @@ def main():
 
             time.sleep(10)
     finally:
-        # 确保线程正常结束
-        output_thread.join(timeout=1)
+        # 确保资源被清理
+        job_manager.kill()
+        job_manager.wait_for_output_thread()
 
 
 if __name__ == "__main__":
