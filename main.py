@@ -96,7 +96,7 @@ class JobObjectManager:
         if self.job:
             try:
                 win32api.CloseHandle(self.job)
-                logging.info("已通过 Job Object 终止整个进程树")
+                logging.info("已终止整个进程树")
             except Exception as e:
                 logging.error(f"关闭 Job Object 失败: {e}")
             finally:
