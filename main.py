@@ -92,7 +92,6 @@ class JobObjectManager:
 
     def kill(self):
         """终止Job及其所有相关进程，清理资源"""
-        # 关闭Job Object句柄
         if self.job:
             try:
                 win32api.CloseHandle(self.job)
