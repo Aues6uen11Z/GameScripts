@@ -20,6 +20,6 @@
    - 分支：留空不填
    - 模板路径：`config`
 3. 在更新页面点击右上角检查更新
-4. 设置好`BetterGI.exe`和`OneDragon Scheduler.exe`的文件路径
+4. 设置好`BetterGI.exe`和`OneDragon-Launcher.exe`的文件路径
 5. 开始运行
 
