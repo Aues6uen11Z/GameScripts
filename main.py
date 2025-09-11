@@ -54,7 +54,8 @@ class JobObjectManager:
                 stderr=subprocess.STDOUT,
                 shell=True,
                 text=True,
-                encoding="gbk",
+                encoding="utf-8",
+                errors="replace",  # 处理编码错误，用替代字符代替无法解码的字符
             )
 
             # 记录PID
@@ -82,10 +83,19 @@ class JobObjectManager:
         if self.process and self.process.stdout:
 
             def read_stream():
-                for line in iter(self.process.stdout.readline, ""):
-                    if line:
-                        callback(line)
-                self.process.stdout.close()
+                try:
+                    for line in iter(self.process.stdout.readline, ""):
+                        if line:
+                            callback(line)
+                except UnicodeDecodeError as e:
+                    logging.warning(f"输出编码错误，跳过该行: {e}")
+                except Exception as e:
+                    logging.error(f"读取输出时发生错误: {e}")
+                finally:
+                    try:
+                        self.process.stdout.close()
+                    except:
+                        pass
 
             self.output_thread = threading.Thread(target=read_stream, daemon=True)
             self.output_thread.start()
