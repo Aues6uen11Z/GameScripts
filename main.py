@@ -197,7 +197,7 @@ def main():
     # 根据选项设置命令和超时时间
     if args.option == "0":
         game_config = config["游戏"]["原神"]["游戏设置"]
-        cmd = f"{game_config['BetterGI路径']} startOneDragon"
+        cmd = f"{game_config['BetterGI路径']} startOneDragon {game_config['配置名称']}"
         timeout = game_config["最长运行时间"]
     elif args.option == "1":
         game_config = config["游戏"]["绝区零"]["游戏设置"]

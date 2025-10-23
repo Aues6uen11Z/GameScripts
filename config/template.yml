@@ -28,6 +28,10 @@ Project:
         type: file
         value: ""
         help: "BetterGI.exe的文件路径\nhttps://github.com/babalae/better-genshin-impact"
+      配置名称:
+        type: input
+        value: ""
+        help: "一条龙的指定配置名称"
       最长运行时间:
         type: input
         value: 30
