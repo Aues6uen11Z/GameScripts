@@ -201,7 +201,7 @@ def main():
         timeout = game_config["最长运行时间"]
     elif args.option == "1":
         game_config = config["游戏"]["绝区零"]["游戏设置"]
-        cmd = f"{game_config['Launcher路径']} -o"
+        cmd = f"{game_config['Launcher路径']} -o -c"
         timeout = game_config["最长运行时间"]
 
     # 验证并处理超时值
