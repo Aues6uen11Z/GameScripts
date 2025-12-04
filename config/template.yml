@@ -54,7 +54,7 @@ Project:
     _Base:
       command:
         value: py main.py 2
-        disabled: true
+        disabled: false
     游戏设置:
       ok-ww路径:
         type: file
