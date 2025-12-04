@@ -6,12 +6,13 @@
 
 - 原神：[BetterGI](https://github.com/babalae/better-genshin-impact)
 - 绝区零：[ZenlessZoneZero-OneDragon](https://github.com/DoctorReid/ZenlessZoneZero-OneDragon)
+- 鸣潮：[ok-wuthering-waves](https://github.com/ok-oldking/ok-wuthering-waves)
 
 # 使用方法
 
 0. 前置准备：
     1. 安装以上需要的项目，设置好配置项并成功运行一次
-    2. 一条龙完成后的行为：BetterGI-**关闭游戏和软件**，绝区零一条龙-**关闭游戏**
+    2. 一条龙完成后的行为：BetterGI-**关闭游戏和软件**
     
 1. 下载安装DaCapo[发布版](https://github.com/Aues6uen11Z/DaCapo/releases/latest)
 2. 左下角设置按钮-创建新实例-从远程创建，名称随意，后面依次填写以下内容后点击创建：
@@ -20,6 +21,7 @@
    - 分支：留空不填
    - 模板路径：`config`
 3. 在更新页面点击右上角检查更新
-4. 设置好`BetterGI.exe`和`OneDragon-Launcher.exe`的文件路径
+4. 设置好`BetterGI.exe`/`OneDragon-Launcher.exe`/`ok-ww.exe`的文件路径
 5. 开始运行
 
+> Tips: 由于鸣潮可以后台运行，为了追求最高效率建议创建两个实例，一个实例单独启用鸣潮并设置后台运行，另一个实例启用其他任务并设置前台运行。

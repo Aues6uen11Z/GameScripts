@@ -186,7 +186,7 @@ class JobObjectManager:
 def main():
     # 解析命令行参数
     parser = argparse.ArgumentParser()
-    parser.add_argument("option", help="选择要启动的游戏: 0=原神, 1=绝区零")
+    parser.add_argument("option", help="选择要启动的游戏: 0=原神, 1=绝区零, 2=鸣潮")
     args = parser.parse_args()
 
     # 加载配置
@@ -202,6 +202,10 @@ def main():
     elif args.option == "1":
         game_config = config["游戏"]["绝区零"]["游戏设置"]
         cmd = f"{game_config['Launcher路径']} -o -c"
+        timeout = game_config["最长运行时间"]
+    elif args.option == "2":
+        game_config = config["游戏"]["鸣潮"]["游戏设置"]
+        cmd = f"{game_config['ok-ww路径']} -t 1 -e"
         timeout = game_config["最长运行时间"]
 
     # 验证并处理超时值

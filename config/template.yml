@@ -6,7 +6,7 @@ Project:
         disabled: true
       background:
         value: false
-        disabled: true
+        disabled: false
       config_path:
         value: "./repos/GameScripts/config/config.json"
         disabled: true
@@ -21,7 +21,7 @@ Project:
   原神:
     _Base:
       command:
-        value: python main.py 0
+        value: py main.py 0
         disabled: true
     游戏设置:
       BetterGI路径:
@@ -39,13 +39,27 @@ Project:
   绝区零:
     _Base:
       command:
-        value: python main.py 1
+        value: py main.py 1
         disabled: true
     游戏设置:
       Launcher路径:
         type: file
         value: ""
         help: "OneDragon-Launcher.exe的文件路径\nhttps://github.com/DoctorReid/ZenlessZoneZero-OneDragon"
+      最长运行时间:
+        type: input
+        value: 30
+        help: "最长运行时间，单位为分钟，超时将强制终止程序\n0表示不限制"
+  鸣潮:
+    _Base:
+      command:
+        value: py main.py 2
+        disabled: true
+    游戏设置:
+      ok-ww路径:
+        type: file
+        value: ""
+        help: "ok-ww.exe的文件路径\nhttps://github.com/ok-oldking/ok-wuthering-waves"
       最长运行时间:
         type: input
         value: 30
