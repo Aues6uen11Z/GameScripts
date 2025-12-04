@@ -9,7 +9,7 @@ Project:
         disabled: false
       config_path:
         value: "./repos/GameScripts/config/config.json"
-        disabled: true
+        disabled: false
       log_path:
         value: "."
   Update:

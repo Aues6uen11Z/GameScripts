@@ -187,10 +187,11 @@ def main():
     # 解析命令行参数
     parser = argparse.ArgumentParser()
     parser.add_argument("option", help="选择要启动的游戏: 0=原神, 1=绝区零, 2=鸣潮")
+    parser.add_argument("config_path", nargs="?", default="config", help="配置文件名，与通用设置中配置路径相对应")
     args = parser.parse_args()
 
     # 加载配置
-    config_path = Path("./config/config.json")
+    config_path = Path(f"./config/{args.config_path}.json")
     with open(config_path, "r", encoding="utf-8") as f:
         config = json.load(f)
 
@@ -207,6 +208,9 @@ def main():
         game_config = config["游戏"]["鸣潮"]["游戏设置"]
         cmd = f"{game_config['ok-ww路径']} -t 1 -e"
         timeout = game_config["最长运行时间"]
+    else:
+        logging.error(f"无效的选项: {args.option}，有效值为: 0=原神, 1=绝区零, 2=鸣潮")
+        return
 
     # 验证并处理超时值
     try:
