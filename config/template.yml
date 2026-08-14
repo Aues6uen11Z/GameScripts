@@ -20,9 +20,12 @@ Project:
 游戏:
   通用:
     _Base:
+      active:
+        value: false
+        disabled: false
       command:
         value: py main.py 0
-        disabled: false
+        disabled: true
     通用设置:
       命令:
         type: input
@@ -34,6 +37,9 @@ Project:
         help: "最长运行时间，单位为分钟，超时将强制终止程序\n0表示不限制"
   原神:
     _Base:
+      active:
+        value: false
+        disabled: false
       command:
         value: py main.py 1
         disabled: true
@@ -52,6 +58,9 @@ Project:
         help: "最长运行时间，单位为分钟，超时将强制终止程序\n0表示不限制"
   绝区零:
     _Base:
+      active:
+        value: false
+        disabled: false
       command:
         value: py main.py 2
         disabled: true
@@ -66,9 +75,12 @@ Project:
         help: "最长运行时间，单位为分钟，超时将强制终止程序\n0表示不限制"
   鸣潮:
     _Base:
+      active:
+        value: false
+        disabled: false
       command:
         value: py main.py 3
-        disabled: false
+        disabled: true
     游戏设置:
       ok-ww路径:
         type: file
