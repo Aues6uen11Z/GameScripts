@@ -195,7 +195,7 @@ def main():
 
     # 根据选项设置命令和超时时间
     if args.option == "0":
-        task_config = config["通用"]["通用设置"]
+        task_config = config["游戏"]["通用"]["通用设置"]
         cmd = task_config["命令"]
         timeout = task_config["最长运行时间"]
     elif args.option == "1":

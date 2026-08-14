@@ -17,22 +17,21 @@ Project:
       env_name:
         value: "zafkiel"
 
-通用:
-  _Base:
-    command:
-      value: py main.py 0
-      disabled: false
-  通用设置:
-    命令:
-      type: input
-      value: ""
-      help: "要执行的命令行"
-    最长运行时间:
-      type: input
-      value: 30
-      help: "最长运行时间，单位为分钟，超时将强制终止程序\n0表示不限制"
-
 游戏:
+  通用:
+    _Base:
+      command:
+        value: py main.py 0
+        disabled: false
+    通用设置:
+      命令:
+        type: input
+        value: ""
+        help: "要执行的命令行"
+      最长运行时间:
+        type: input
+        value: 30
+        help: "最长运行时间，单位为分钟，超时将强制终止程序\n0表示不限制"
   原神:
     _Base:
       command:
