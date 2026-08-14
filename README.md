@@ -2,8 +2,9 @@
 
 在[DaCapo](https://github.com/Aues6uen11Z/DaCapo)上运行游戏自动化程序的权宜之计，不支持更改配置项，仅提供自动运行功能。
 
-## 支持的游戏
+## 支持的任务
 
+- 通用命令：执行任意命令行，需自行配置命令与超时时间
 - 原神：[BetterGI](https://github.com/babalae/better-genshin-impact)
 - 绝区零：[ZenlessZoneZero-OneDragon](https://github.com/DoctorReid/ZenlessZoneZero-OneDragon)
 - 鸣潮：[ok-wuthering-waves](https://github.com/ok-oldking/ok-wuthering-waves)
@@ -39,4 +40,4 @@
 - 不启用鸣潮以外任务
 - 项目-通用-基本设置-后台程序勾选
 - 项目-通用-基本设置-配置路径改为`./repos/GameScripts/config/ww.json`
-- 游戏-鸣潮-任务设置-命令改为`py mian.py 2 ww`
+- 游戏-鸣潮-任务设置-命令改为`py main.py 3 ww`

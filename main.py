@@ -71,12 +71,10 @@ class JobObjectManager:
             win32api.CloseHandle(process_handle)  # 关闭我们打开的句柄
 
             logging.info(f"主进程 PID: {self.pid}")
-
-            return True
         except Exception as e:
             logging.error(f"启动进程失败: {e}")
             self.kill()  # 清理资源
-            return False
+            raise
 
     def start_output_monitoring(self, callback):
         """启动输出监控线程"""
@@ -186,7 +184,7 @@ class JobObjectManager:
 def main():
     # 解析命令行参数
     parser = argparse.ArgumentParser()
-    parser.add_argument("option", help="选择要启动的游戏: 0=原神, 1=绝区零, 2=鸣潮")
+    parser.add_argument("option", help="选择要启动的任务: 0=通用命令, 1=原神, 2=绝区零, 3=鸣潮")
     parser.add_argument("config_path", nargs="?", default="config", help="配置文件名，与通用设置中配置路径相对应")
     args = parser.parse_args()
 
@@ -197,20 +195,23 @@ def main():
 
     # 根据选项设置命令和超时时间
     if args.option == "0":
+        task_config = config["通用"]["通用设置"]
+        cmd = task_config["命令"]
+        timeout = task_config["最长运行时间"]
+    elif args.option == "1":
         game_config = config["游戏"]["原神"]["游戏设置"]
         cmd = f"{game_config['BetterGI路径']} startOneDragon {game_config['配置名称']}"
         timeout = game_config["最长运行时间"]
-    elif args.option == "1":
+    elif args.option == "2":
         game_config = config["游戏"]["绝区零"]["游戏设置"]
         cmd = f"{game_config['Launcher路径']} -o -c"
         timeout = game_config["最长运行时间"]
-    elif args.option == "2":
+    elif args.option == "3":
         game_config = config["游戏"]["鸣潮"]["游戏设置"]
         cmd = f"{game_config['ok-ww路径']} -t 1 -e"
         timeout = game_config["最长运行时间"]
     else:
-        logging.error(f"无效的选项: {args.option}，有效值为: 0=原神, 1=绝区零, 2=鸣潮")
-        return
+        raise ValueError(f"无效的选项: {args.option}，有效值为: 0=通用命令, 1=原神, 2=绝区零, 3=鸣潮")
 
     # 验证并处理超时值
     try:
@@ -224,29 +225,26 @@ def main():
 
     # 启动Job管理器
     job_manager = JobObjectManager(cmd)
-    if not job_manager.start():
-        return
 
     # 处理进程输出
     def handle_output(line):
         if line:
             print(line.strip())
 
-    # 启动输出监控
-    job_manager.start_output_monitoring(handle_output)
-
-    # 监控进程，处理超时
-    start_time = time.time()
     try:
+        job_manager.start()
+        # 启动输出监控
+        job_manager.start_output_monitoring(handle_output)
+
+        # 监控进程，处理超时
+        start_time = time.time()
         while True:
             if not job_manager.has_active_processes():
                 logging.info("进程正常结束")
                 break
 
             if timeout > 0 and (time.time() - start_time > timeout * 60):
-                logging.info("运行超时，正在终止进程...")
-                job_manager.kill()
-                break
+                raise TimeoutError(f"运行超时（{timeout}分钟），正在终止进程...")
 
             time.sleep(10)
     finally:
