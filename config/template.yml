@@ -25,7 +25,7 @@ Project:
         disabled: false
       command:
         value: py main.py 0
-        disabled: true
+        disabled: false
     通用设置:
       命令:
         type: input
@@ -42,7 +42,7 @@ Project:
         disabled: false
       command:
         value: py main.py 1
-        disabled: true
+        disabled: false
     游戏设置:
       BetterGI路径:
         type: file
@@ -63,7 +63,7 @@ Project:
         disabled: false
       command:
         value: py main.py 2
-        disabled: true
+        disabled: false
     游戏设置:
       Launcher路径:
         type: file
@@ -80,7 +80,7 @@ Project:
         disabled: false
       command:
         value: py main.py 3
-        disabled: true
+        disabled: false
     游戏设置:
       ok-ww路径:
         type: file

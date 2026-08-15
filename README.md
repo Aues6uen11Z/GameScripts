@@ -1,13 +1,26 @@
 # GameScripts
 
-在[DaCapo](https://github.com/Aues6uen11Z/DaCapo)上运行游戏自动化程序的权宜之计，不支持更改配置项，仅提供自动运行功能。
+在[DaCapo](https://github.com/Aues6uen11Z/DaCapo)上运行游戏自动化程序的脚本集合。
 
 ## 支持的任务
 
-- 通用命令：执行任意命令行，需自行配置命令与超时时间
+- 通用：执行任意命令行，需自行配置命令与超时时间
 - 原神：[BetterGI](https://github.com/babalae/better-genshin-impact)
 - 绝区零：[ZenlessZoneZero-OneDragon](https://github.com/DoctorReid/ZenlessZoneZero-OneDragon)
 - 鸣潮：[ok-wuthering-waves](https://github.com/ok-oldking/ok-wuthering-waves)
+
+## 任务编号
+
+| 编号 | 任务 |
+|------|------|
+| 0 | 通用 |
+| 1 | 原神 |
+| 2 | 绝区零 |
+| 3 | 鸣潮 |
+
+最佳实践：每个实例单独运行一个任务。任务命令需手动填写，格式为 `py main.py <编号> <配置文件名>`，其中配置文件名与通用设置中的配置路径对应，即 config 目录下 json 文件的文件名（不含扩展名）。
+
+例如配置路径为 `./repos/GameScripts/config/ys.json` 时，原神任务的命令填写 `py main.py 1 ys`。
 
 ## 快速开始
 
@@ -23,7 +36,9 @@
    - 模板路径：`config`
 3. 在更新页面点击右上角检查更新
 4. 设置好`BetterGI.exe`/`OneDragon-Launcher.exe`/`ok-ww.exe`的文件路径
-5. 开始运行
+5. 填写任务命令，格式为`py main.py <编号> <配置文件名>`，配置文件名须与配置路径一致
+6. 在任务设置中启用要运行的任务（默认全部不启用），仅保留一个任务开启
+7. 开始运行
 
 ## 进阶
 
